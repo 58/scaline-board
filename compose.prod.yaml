@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  play-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    environment:
+      - APPLICATION_SECRET=${APPLICATION_SECRET:-changeme}

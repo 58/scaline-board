@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  play-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      # 開発用の秘密キー (実際には .env や環境変数管理などで外部化推奨)
+      - APPLICATION_SECRET=secret-for-dev
+    volumes:
+      # 現在のディレクトリをコンテナの /app に丸ごとマウント
+      - ./:/app
+    # ホットリロードのため、sbt run コマンドを実行
+    command: ["sbt", "run", "-Dplay.http.secret.key=${APPLICATION_SECRET}", "-Dplay.server.pidfile.path=/dev/null"]

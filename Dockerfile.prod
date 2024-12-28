@@ -1,0 +1,40 @@
+# -------------------------------------------------
+# Dockerfile.prod (本番用: マルチステージビルド)
+# -------------------------------------------------
+
+# =======================
+# Stage 1: Build Stage
+# =======================
+FROM hseeberger/scala-sbt:11.0.16_1.8.3_2.13.12 AS builder
+WORKDIR /app
+
+# プロジェクトファイル一式をコピー
+COPY . ./
+
+# sbt stage で実行可能なzipを作成
+RUN sbt stage
+
+# =======================
+# Stage 2: Runtime Stage
+# =======================
+FROM openjdk:11-jre-slim
+
+WORKDIR /app
+
+# builder で生成されたzipをコピーして解凍
+COPY --from=builder /app/target/universal/your-play-project*.zip /tmp/
+
+RUN apt-get update && apt-get install -y unzip && \
+    unzip /tmp/your-play-project*.zip -d /app && \
+    mv /app/your-play-project-* /app/your-play-project && \
+    rm /tmp/your-play-project*.zip && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+EXPOSE 9000
+
+# Play アプリ起動用のENTRYPOINT
+ENTRYPOINT ["/app/your-play-project/bin/your-play-project", \
+            "-Dplay.http.secret.key=${APPLICATION_SECRET}", \
+            "-Dplay.server.pidfile.path=/dev/null", \
+            "-J-XX:+UseG1GC", \
+            "-J-XX:+UseStringDeduplication"]
