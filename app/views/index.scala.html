@@ -1,5 +1,26 @@
-@()
+@import helper.CSRF
+@(posts: Seq[models.BoardPost])(implicit request: RequestHeader)
 
-@main("Welcome to Play") {
-  <h1>Welcome to Play!</h1>
+@main("一行掲示板") {
+  <h1>一行掲示板</h1>
+
+  <form action="@routes.BoardController.post()" method="POST">
+    @CSRF.formField
+    <p>
+      名前: <input type="text" name="name">
+    </p>
+    <p>
+      メッセージ: <input type="text" name="message">
+    </p>
+    <button type="submit">投稿</button>
+  </form>
+
+  <hr/>
+
+  <h2>投稿一覧</h2>
+  <ul>
+    @for(post <- posts) {
+      <li>@post.name : @post.message (@post.ipAddress, @post.createdAt)</li>
+    }
+  </ul>
 }
