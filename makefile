@@ -10,7 +10,7 @@ dev-build:
 
 ## 開発用コンテナ起動 (バックグラウンド)
 dev-up:
-	docker compose -f compose.yaml -f compose.dev.yaml up -d
+	docker compose -f compose.yaml -f compose.dev.yaml up
 
 ## 開発用コンテナ停止＆コンテナ削除
 dev-down:
